@@ -25,7 +25,7 @@ $__FUX_SERVICE_ARE_BOOTSTRAPPED = false;
 function bootstrapServiceProviders()
 {
     global $__FUX_SERVICE_ARE_BOOTSTRAPPED;
-    $files = rglob(__DIR__ . "/../../service/*.php");
+    $files = rglob(__DIR__ . "/../../services/*.php");
     foreach ($files as $fileName) {
         include_once $fileName;
     }
@@ -36,13 +36,6 @@ function bootstrapServiceProviders()
                 $implementations = class_implements($className);
                 if (isset($implementations['IServiceProvider'])) {
                     $className::bootstrap();
-                    /*(new LogModel())->save([
-                        "method" => "SERVICE BS",
-                        "url" => (new Request())->requestUri,
-                        "body" => "$className",
-                        "session" => DB::ref()->real_escape_string(json_encode($_SESSION ?? [])),
-                        "ip" => isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR']
-                    ]);*/
                 }
             }
         }
@@ -243,12 +236,12 @@ function send_email($to, $sub, $mes, $from)
     $mail = new PHPMailer;
     $mail->isSMTP();
     $mail->SMTPDebug = 0;
-    $mail->Host = 'mail.bookizon.it';
-    $mail->Port = 25;
+    $mail->Host = SMTP_HOST;
+    $mail->Port = SMTP_PORT;
     $mail->SMTPAuth = true;
-    $mail->Username = 'noreply@bookizon.it';
-    $mail->Password = '}njEl3Dh@H9G';
-    $mail->setFrom('noreply@bookizon.it', $from);
+    $mail->Username = SMTP_USERNAME;
+    $mail->Password = SMTP_PASSWORD;
+    $mail->setFrom(SMTP_FROM_ADDRESS, $from);
     $mail->addReplyTo('', '');
     $mail->addAddress($to);
     $mail->Subject = $sub;

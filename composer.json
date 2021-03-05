@@ -1,0 +1,12 @@
+{
+    "name": "matteo/fux-framework",
+    "require": {
+        "phpmailer/phpmailer": "^6.3"
+    },
+    "authors": [
+        {
+            "name": "matteo",
+            "email": "mfusillo98@gmail.com"
+        }
+    ]
+}

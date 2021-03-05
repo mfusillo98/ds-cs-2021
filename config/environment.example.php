@@ -17,3 +17,9 @@ define("DB_USER", "root");
 define("DB_PASSWORD", "root");
 define("DB_DATABASE", "database_name");
 
+/** @MARK Email configuration */
+define("SMTP_HOST", "mail.example.com");
+define("SMTP_USERNAME", "my_username");
+define("SMTP_PASSWORD", "my_secret_password");
+define("SMTP_FROM_ADDRESS", "noreply@example.com");
+define("SMTP_PORT", 25);
