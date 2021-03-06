@@ -164,13 +164,6 @@ function addCssToHead($css){
 
 function redirect($route)
 {
-    (new LogModel())->save([
-        "method" => "REDIRECT",
-        "url" => (new Request())->requestUri,
-        "body" => "Redirect to $route",
-        "session" => DB::ref()->real_escape_string(json_encode($_SESSION ?? [])),
-        "ip" => isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR']
-    ]);
     header("Location: " . PROJECT_HTTP_SCHEMA . "://" . DOMAIN_NAME . PROJECT_DIR . $route);
     exit;
 }

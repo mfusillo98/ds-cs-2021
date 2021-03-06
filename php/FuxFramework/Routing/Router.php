@@ -3,7 +3,6 @@
 namespace Fux;
 
 use FuxResponse;
-use LogModel;
 
 include_once __DIR__ . '/../Middleware/IMiddleware.php';
 include_once 'Request.php';
@@ -137,26 +136,6 @@ class Router
         }
 
         if ($output instanceof FuxResponse) {
-            /*
-             * LOGGING AREA
-             * */
-
-            $ip = isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR'];
-
-
-            (new LogModel())->save([
-                "method" => "OUT:".$_SERVER['REQUEST_METHOD'],
-                "url" => $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
-                "user_agent" => $_SERVER['HTTP_USER_AGENT'] ?? '',
-                "body" => DB::ref()->real_escape_string((string) $output),
-                "session" => '',
-                "ip" => $ip
-            ]);
-
-            /*
-             * END LOGGING AREA
-             * */
-
             if ($output->isError() && $output->isPretty()) {
                 if (file_exists(PROJECT_VIEWS_DIR . '/errors/fux.php')) {
                     view("errors/fux", ["errorMessage" => $output->getMessage()]);
