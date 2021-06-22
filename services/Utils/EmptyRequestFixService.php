@@ -1,11 +1,9 @@
 <?php
-use Fux\DB;
-
 
 /**
  * @description: Interfaccia gestire l'autenticazione degli admin del sistema, effettuare il logo logout e sapere chi è attualmente loggato
  * */
-class ReactAxiosFixService extends FuxServiceProvider implements IServiceProvider
+class EmptyRequestFixService extends FuxServiceProvider implements IServiceProvider
 {
     public static function bootstrap(){ /* Do nothing */ }
 

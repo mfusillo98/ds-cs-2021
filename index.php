@@ -17,11 +17,10 @@ sanitize_get();
 sanitize_post();
 sanitize_request();
 
-use Fux\DB;
 use Fux\Request;
 use Fux\Router;
 
-ReactAxiosFixService::fix();
+EmptyRequestFixService::fix();
 
 $router = new Router(new Request());
 

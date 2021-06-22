@@ -25,7 +25,7 @@ $__FUX_SERVICE_ARE_BOOTSTRAPPED = false;
 function bootstrapServiceProviders()
 {
     global $__FUX_SERVICE_ARE_BOOTSTRAPPED;
-    $files = rglob(__DIR__ . "/../../service/*.php");
+    $files = rglob(__DIR__ . "/../../services/*.php");
     foreach ($files as $fileName) {
         include_once $fileName;
     }

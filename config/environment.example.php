@@ -13,7 +13,7 @@
 //define("PROJECT_HTTP_SCHEMA","http");
 
 /** @MARK Database Connection */
-//define("DB_ENABLE", true);
+//define("DB_ENABLE", false);
 //define("DB_HOST", "localhost");
 //define("DB_USER", "root");
 //define("DB_PASSWORD", "root");
