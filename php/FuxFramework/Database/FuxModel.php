@@ -199,7 +199,15 @@ class FuxModel
 
     public function delete($pk_value, $forceDelete = false)
     {
-        return $this->deleteWhere($this->pk_field[0] . " = '$pk_value'", $forceDelete);
+        $whereClause = [];
+        if (is_array($pk_value)){
+            foreach($pk_value as $field => $value){
+                $whereClause[] = "$field = '$value'";
+            }
+        }else {
+            $whereClause[] = $this->pk_field[0] . " = '$pk_value'";
+        }
+        return $this->deleteWhere(implode(" AND ",$whereClause), $forceDelete);
     }
 
     public function deleteWhere($where, $forceDelete = false)
@@ -424,7 +432,7 @@ class FuxModel
     public function issetPkField($data, $andIsNotNull = false)
     {
         foreach ($this->pk_field as $pk) {
-            if (!isset($data[$pk]) || ($andIsNotNull && $data[$pk] == null)) return false;
+            if (!isset($data[$pk]) || ($andIsNotNull && $data[$pk] === null)) return false;
         }
         return true;
     }

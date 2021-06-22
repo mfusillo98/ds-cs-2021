@@ -25,7 +25,15 @@ spl_autoload_register(function ($className) {
 $_CONTROLLERS_FILESYSTEM_TREE = null;
 spl_autoload_register(function ($className) {
     global $_CONTROLLERS_FILESYSTEM_TREE;
-    if (strpos($className, "Controller")) {
+    if (strpos($className, "App\Controllers") !== false) { //Controller con namespace PSR
+        $relativeClassPath = str_replace("App/Controllers", "", str_replace("\\", "/", $className));
+        $filePath = __DIR__ . "/../../controllers/$relativeClassPath.php";
+        if (file_exists($filePath)) {
+            include_once $filePath;
+        } else {
+            throw new Exception("FuxAutoloaderException: Cannot autoload app class $className. File $filePath doesn't exists.");
+        }
+    }if (strpos($className, "Controller")) { //Controller con scansione della directory "controllers"
         $classNameParts = explode("\\", $className);
         $className = end($classNameParts); //Rimuovo la parte di namespacing
         $files = $_CONTROLLERS_FILESYSTEM_TREE ?? rglob(PROJECT_ROOT_DIR . "/controllers/*.php");
@@ -52,7 +60,15 @@ spl_autoload_register(function ($className) {
 $_MODELS_FILESYSTEM_TREE = null;
 spl_autoload_register(function ($className) {
     global $_MODELS_FILESYSTEM_TREE;
-    if (strpos($className, "Model")) {
+    if (strpos($className, "App\Models") !== false) { //Model con namespace PSR
+        $relativeClassPath = str_replace("App/Models", "", str_replace("\\", "/", $className));
+        $filePath = __DIR__ . "/../../models/$relativeClassPath.php";
+        if (file_exists($filePath)) {
+            include_once $filePath;
+        } else {
+            throw new Exception("FuxAutoloaderException: Cannot autoload app class $className. File $filePath doesn't exists.");
+        }
+    } elseif (strpos($className, "Model") !== false) { //Model con scansione della directory "models"
         $files = $_MODELS_FILESYSTEM_TREE ?? rglob(PROJECT_ROOT_DIR . "/models/*.php");
         foreach ($files as $filePath) {
             $fileName = basename($filePath);

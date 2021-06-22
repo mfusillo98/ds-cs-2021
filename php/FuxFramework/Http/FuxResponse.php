@@ -1,9 +1,9 @@
 <?php
 
+namespace Fux;
+
 class FuxResponse
 {
-
-
     private $response = [];
     private $canBePretty = false;
 

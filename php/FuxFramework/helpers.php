@@ -25,7 +25,7 @@ $__FUX_SERVICE_ARE_BOOTSTRAPPED = false;
 function bootstrapServiceProviders()
 {
     global $__FUX_SERVICE_ARE_BOOTSTRAPPED;
-    $files = rglob(__DIR__ . "/../../services/*.php");
+    $files = rglob(__DIR__ . "/../../service/*.php");
     foreach ($files as $fileName) {
         include_once $fileName;
     }
@@ -36,6 +36,13 @@ function bootstrapServiceProviders()
                 $implementations = class_implements($className);
                 if (isset($implementations['IServiceProvider'])) {
                     $className::bootstrap();
+                    /*(new LogModel())->save([
+                        "method" => "SERVICE BS",
+                        "url" => (new Request())->requestUri,
+                        "body" => "$className",
+                        "session" => DB::ref()->real_escape_string(json_encode($_SESSION ?? [])),
+                        "ip" => isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR']
+                    ]);*/
                 }
             }
         }
@@ -88,13 +95,13 @@ function view($viewName, $viewData = [])
     return "";
 }
 
-function viewCompose($viewAlias, $ovverideData = [])
+function viewCompose($viewAlias, $ovverideData = [], $params = [])
 {
     $fuxView = FuxViewComposerManager::getView($viewAlias);
     if ($fuxView) {
         return view(
             $fuxView->getPath(),
-            array_merge($fuxView->getData(), $ovverideData)
+            array_merge($fuxView->getData($params), $ovverideData)
         );
     }
     return '';
@@ -115,6 +122,7 @@ function assetOnce($asset, $type)
     global $__FUX_INCLUDED_ASSETS;
     if (!isset($__FUX_INCLUDED_ASSETS[$asset . '_' . $type])) {
         $assetURL = asset($asset);
+        $__FUX_INCLUDED_ASSETS[$asset . '_' . $type] = true;
         switch ($type) {
             case 'script':
                 return "<script src='$assetURL'></script>";
@@ -136,13 +144,31 @@ function assetOnce($asset, $type)
                 ";
                 break;
         }
-        $__FUX_INCLUDED_ASSETS[$asset . '_' . $type] = true;
     }
     return '';
 }
 
-function addCssToHead($css){
-    $css = str_replace("\n","",$css);
+$__FUX_INCLUDED_EXTERNAL_ASSETS = [];
+function assetExternalOnce($assetURL, $type)
+{
+    global $__FUX_INCLUDED_EXTERNAL_ASSETS;
+    if (!isset($__FUX_INCLUDED_EXTERNAL_ASSETS[$assetURL . '_' . $type])) {
+        switch ($type) {
+            case 'script':
+                return "<script src='$assetURL'></script>";
+                break;
+            case 'CSS':
+                return "<link rel='stylesheet' type='text/css' href='$assetURL'>";
+                break;
+        }
+        $__FUX_INCLUDED_EXTERNAL_ASSETS[$assetURL . '_' . $type] = true;
+    }
+    return '';
+}
+
+function addCssToHead($css)
+{
+    $css = str_replace("\n", "", $css);
     return "
         <script>
             (function(){
@@ -162,8 +188,25 @@ function addCssToHead($css){
     ";
 }
 
+
+$__FUX_INCLUDED_JSX_COMPONENTS = [];
+function importJSXComponent($publicPath)
+{
+    global $__FUX_INCLUDED_JSX_COMPONENTS;
+    if (in_array($publicPath, $__FUX_INCLUDED_JSX_COMPONENTS)) return;
+    $__FUX_INCLUDED_JSX_COMPONENTS[] = $publicPath;
+    return file_get_contents(PROJECT_ROOT_DIR . "/public/$publicPath");
+}
+
 function redirect($route)
 {
+    (new LogModel())->save([
+        "method" => "REDIRECT",
+        "url" => (new Request())->requestUri,
+        "body" => "Redirect to $route",
+        "session" => DB::ref()->real_escape_string(json_encode($_SESSION ?? [])),
+        "ip" => isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR']
+    ]);
     header("Location: " . PROJECT_HTTP_SCHEMA . "://" . DOMAIN_NAME . PROJECT_DIR . $route);
     exit;
 }
@@ -229,16 +272,18 @@ function send_email($to, $sub, $mes, $from)
     $mail = new PHPMailer;
     $mail->isSMTP();
     $mail->SMTPDebug = 0;
-    $mail->Host = SMTP_HOST;
-    $mail->Port = SMTP_PORT;
+    $mail->Host = 'mail.bookizon.it';
+    $mail->Port = 25;
     $mail->SMTPAuth = true;
-    $mail->Username = SMTP_USERNAME;
-    $mail->Password = SMTP_PASSWORD;
-    $mail->setFrom(SMTP_FROM_ADDRESS, $from);
+    $mail->Username = 'noreply@bookizon.it';
+    $mail->Password = '}njEl3Dh@H9G';
+    $mail->setFrom('noreply@bookizon.it', $from);
     $mail->addReplyTo('', '');
     $mail->addAddress($to);
     $mail->Subject = $sub;
     $mail->isHTML(true);
+    $mail->CharSet = 'UTF-8';
+    $mail->Encoding = 'base64';
     $mail->Body = $mes;
     if (!$mail->send()) {
         echo 'Mailer Error: ' . $mail->ErrorInfo;
@@ -279,6 +324,18 @@ if (!function_exists('HTMLToRGB')) {
         return $b + ($g << 0x8) + ($r << 0x10);
     }
 }
+function HTMLToRGBArray($htmlCode)
+{
+    $RGB = HTMLToRGB($htmlCode);
+    $r = 0xFF & ($RGB >> 0x10);
+    $g = 0xFF & ($RGB >> 0x8);
+    $b = 0xFF & $RGB;
+    $r = ((float)$r);
+    $g = ((float)$g);
+    $b = ((float)$b);
+    return ["r" => $r, "g" => $g, "b" => $b];
+}
+
 if (!function_exists('RGBToHSL')) {
     function RGBToHSL($RGB)
     {
@@ -364,9 +421,9 @@ if (!function_exists("mime_content_type")) {
 function mime2ext($mime)
 {
     $all_mimes = '{"webp":["image\/webp"],"png":["image\/png","image\/x-png"],"bmp":["image\/bmp","image\/x-bmp","image\/x-bitmap","image\/x-xbitmap","image\/x-win-bitmap","image\/x-windows-bmp","image\/ms-bmp","image\/x-ms-bmp","application\/bmp","application\/x-bmp","application\/x-win-bitmap"],"gif":["image\/gif"],"jpeg":["image\/jpeg","image\/pjpeg"],"xspf":["application\/xspf+xml"],"vlc":["application\/videolan"],"wmv":["video\/x-ms-wmv","video\/x-ms-asf"],"au":["audio\/x-au"],"ac3":["audio\/ac3"],"flac":["audio\/x-flac"],"ogg":["audio\/ogg","video\/ogg","application\/ogg"],"kmz":["application\/vnd.google-earth.kmz"],"kml":["application\/vnd.google-earth.kml+xml"],"rtx":["text\/richtext"],"rtf":["text\/rtf"],"jar":["application\/java-archive","application\/x-java-application","application\/x-jar"],"zip":["application\/x-zip","application\/zip","application\/x-zip-compressed","application\/s-compressed","multipart\/x-zip"],"7zip":["application\/x-compressed"],"xml":["application\/xml","text\/xml"],"svg":["image\/svg+xml"],"3g2":["video\/3gpp2"],"3gp":["video\/3gp","video\/3gpp"],"mp4":["video\/mp4"],"m4a":["audio\/x-m4a"],"f4v":["video\/x-f4v"],"flv":["video\/x-flv"],"webm":["video\/webm"],"aac":["audio\/x-acc"],"m4u":["application\/vnd.mpegurl"],"pdf":["application\/pdf","application\/octet-stream"],"pptx":["application\/vnd.openxmlformats-officedocument.presentationml.presentation"],"ppt":["application\/powerpoint","application\/vnd.ms-powerpoint","application\/vnd.ms-office","application\/msword"],"docx":["application\/vnd.openxmlformats-officedocument.wordprocessingml.document"],"xlsx":["application\/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application\/vnd.ms-excel"],"xl":["application\/excel"],"xls":["application\/msexcel","application\/x-msexcel","application\/x-ms-excel","application\/x-excel","application\/x-dos_ms_excel","application\/xls","application\/x-xls"],"xsl":["text\/xsl"],"mpeg":["video\/mpeg"],"mov":["video\/quicktime"],"avi":["video\/x-msvideo","video\/msvideo","video\/avi","application\/x-troff-msvideo"],"movie":["video\/x-sgi-movie"],"log":["text\/x-log"],"txt":["text\/plain"],"css":["text\/css"],"html":["text\/html"],"wav":["audio\/x-wav","audio\/wave","audio\/wav"],"xhtml":["application\/xhtml+xml"],"tar":["application\/x-tar"],"tgz":["application\/x-gzip-compressed"],"psd":["application\/x-photoshop","image\/vnd.adobe.photoshop"],"exe":["application\/x-msdownload"],"js":["application\/x-javascript"],"mp3":["audio\/mpeg","audio\/mpg","audio\/mpeg3","audio\/mp3"],"rar":["application\/x-rar","application\/rar","application\/x-rar-compressed"],"gzip":["application\/x-gzip"],"hqx":["application\/mac-binhex40","application\/mac-binhex","application\/x-binhex40","application\/x-mac-binhex40"],"cpt":["application\/mac-compactpro"],"bin":["application\/macbinary","application\/mac-binary","application\/x-binary","application\/x-macbinary"],"oda":["application\/oda"],"ai":["application\/postscript"],"smil":["application\/smil"],"mif":["application\/vnd.mif"],"wbxml":["application\/wbxml"],"wmlc":["application\/wmlc"],"dcr":["application\/x-director"],"dvi":["application\/x-dvi"],"gtar":["application\/x-gtar"],"php":["application\/x-httpd-php","application\/php","application\/x-php","text\/php","text\/x-php","application\/x-httpd-php-source"],"swf":["application\/x-shockwave-flash"],"sit":["application\/x-stuffit"],"z":["application\/x-compress"],"mid":["audio\/midi"],"aif":["audio\/x-aiff","audio\/aiff"],"ram":["audio\/x-pn-realaudio"],"rpm":["audio\/x-pn-realaudio-plugin"],"ra":["audio\/x-realaudio"],"rv":["video\/vnd.rn-realvideo"],"jp2":["image\/jp2","video\/mj2","image\/jpx","image\/jpm"],"tiff":["image\/tiff"],"eml":["message\/rfc822"],"pem":["application\/x-x509-user-cert","application\/x-pem-file"],"p10":["application\/x-pkcs10","application\/pkcs10"],"p12":["application\/x-pkcs12"],"p7a":["application\/x-pkcs7-signature"],"p7c":["application\/pkcs7-mime","application\/x-pkcs7-mime"],"p7r":["application\/x-pkcs7-certreqresp"],"p7s":["application\/pkcs7-signature"],"crt":["application\/x-x509-ca-cert","application\/pkix-cert"],"crl":["application\/pkix-crl","application\/pkcs-crl"],"pgp":["application\/pgp"],"gpg":["application\/gpg-keys"],"rsa":["application\/x-pkcs7"],"ics":["text\/calendar"],"zsh":["text\/x-scriptzsh"],"cdr":["application\/cdr","application\/coreldraw","application\/x-cdr","application\/x-coreldraw","image\/cdr","image\/x-cdr","zz-application\/zz-winassoc-cdr"],"wma":["audio\/x-ms-wma"],"vcf":["text\/x-vcard"],"srt":["text\/srt"],"vtt":["text\/vtt"],"ico":["image\/x-icon","image\/x-ico","image\/vnd.microsoft.icon"],"csv":["text\/x-comma-separated-values","text\/comma-separated-values","application\/vnd.msexcel"],"json":["application\/json","text\/json"]}';
-    $all_mimes = json_decode($all_mimes,true);
-    foreach( $all_mimes as $key => $value )
-        if( array_search($mime,$value) !== false ) return $key;
+    $all_mimes = json_decode($all_mimes, true);
+    foreach ($all_mimes as $key => $value)
+        if (array_search($mime, $value) !== false) return $key;
     return null;
 }
 
@@ -381,9 +438,10 @@ function array_combine_keep_copy($keys, $values)
 }
 
 
-function my_array_unique($array){
+function my_array_unique($array)
+{
     $a = [];
-    foreach($array as $k => $v)
+    foreach ($array as $k => $v)
         $a[$v] = true;
     return array_keys($a);
 }

@@ -19,9 +19,9 @@ class FuxView {
         return $this->viewPath;
     }
 
-    public function getData(){
+    public function getData($params = []){
         if ($this->dataCallback && is_callable($this->dataCallback)){
-            return call_user_func($this->dataCallback);
+            return call_user_func($this->dataCallback, $params);
         }
         return [];
     }

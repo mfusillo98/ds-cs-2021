@@ -72,7 +72,13 @@ class Request implements IRequest
     }
 
     public function getParams(){
-        return $this->params;
+        $params = $this->params;
+        array_walk_recursive($params, function (&$value){
+            if (is_string($value)) {
+                $value = DB::sanitize($value);
+            }
+        });
+        return $params;
     }
 
     public function getQueryStringParams(){
@@ -81,7 +87,7 @@ class Request implements IRequest
             $params = $_GET;
             array_walk_recursive($params, function (&$value){
                 if (is_string($value)) {
-                    $value = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+                    $value = DB::sanitize($value);
                 }
             });
         }
@@ -100,7 +106,7 @@ class Request implements IRequest
             if ($_POST) {
                 array_walk_recursive($body, function (&$value) {
                     if (is_string($value)) {
-                        $value = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+                        $value = DB::sanitize($value);
                     }
                 });
             }
