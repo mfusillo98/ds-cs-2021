@@ -4,9 +4,9 @@
 include_once (__DIR__."/environment.php");
 
 /** @MARK Project information */
-define("BRAND_NAME","Bookizon");
-define("PROJECT_NAME","Bookizon");
-define("OWNER_NAME", "Bookizon");
+define("BRAND_NAME","FuxFramework");
+define("PROJECT_NAME","FuxFramework");
+define("OWNER_NAME", "FuxFramework");
 
 /** @MARK Project information */
 define("ROOT_DIR",$_SERVER['DOCUMENT_ROOT']);
