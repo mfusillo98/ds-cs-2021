@@ -226,8 +226,16 @@ class FuxModel
 
     public function getRecord($pk_value, $neededFields = null)
     {
-        global $mysqli;
-        $sql = "SELECT * FROM " . $this->table_name . " WHERE " . $this->pk_field[0] . " = '$pk_value'";
+        $qb = (new FuxQueryBuilder())->select("*")->from($this->table_name);
+
+        if (is_array($pk_value)) {
+            foreach ($pk_value as $f => $v) $qb->where($f, $v);
+        } else {
+            $qb->where($this->pk_field[0], $pk_value);
+        }
+
+        $sql = $qb->result();
+
         $q = DB::ref()->query($sql) or die(DB::ref()->error . "-" . $sql);
         if ($row = $q->fetch_assoc()) {
             $this->loadedData = $row;
