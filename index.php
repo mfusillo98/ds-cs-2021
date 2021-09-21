@@ -12,10 +12,11 @@ include_once './php/FuxFramework/Routing/Request.php';
 include_once './php/FuxFramework/Routing/Router.php';
 include_once './php/FuxFramework/helpers.php';
 
-
-sanitize_get();
-sanitize_post();
-sanitize_request();
+if (DB_ENABLE){
+    sanitize_get();
+    sanitize_post();
+    sanitize_request();
+}
 
 use Fux\Request;
 use Fux\Router;
