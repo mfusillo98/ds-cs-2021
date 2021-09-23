@@ -28,6 +28,7 @@ require_once __DIR__ . '/autoloaders.php';
 require_once __DIR__ . '/Service/FuxServiceProvider.php';
 require_once __DIR__ . '/Database/FuxModel.php';
 require_once __DIR__ . '/Database/DB.php';
+require_once __DIR__ . '/Database/OracleDB.php';
 require_once __DIR__ . '/View/FuxView.php';
 require_once __DIR__ . '/View/FuxViewComposerManager.php';
 require_once __DIR__ . '/FuxDataModel.php';
@@ -51,7 +52,7 @@ $hrs = floor($mins / 60);
 $mins -= $hrs * 60;
 $offset = sprintf('%+d:%02d', $hrs * $sgn, $mins);
 
-if (DB_ENABLE) {
+if (DB_ENABLE && DB_TYPE === DB_TYPE_MYSQL) {
     DB::ref()->set_charset("utf8");
     DB::ref()->query("SET SESSION sql_mode = 'ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
     DB::ref()->query("SET time_zone='$offset'");

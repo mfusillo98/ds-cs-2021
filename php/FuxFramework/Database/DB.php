@@ -15,16 +15,27 @@ class DB
             return self::$connection;
         }
 
-        $mysqli = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
-        if (!$mysqli) {
-            throw new \Error("Database connection error");
+        switch(DB_TYPE){
+            case DB_TYPE_MYSQL:
+                $connection = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+                if (!$connection) {
+                    throw new \Error("Database connection error");
+                }
+                $connection->query("SET time_zone = '+1:00'");
+                $connection->query("SET timezone = '+1:00'");
+                $connection->set_charset("utf8mb4");
+                $connection->query("SET SESSION sql_mode = 'ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                break;
+            case DB_TYPE_ORACLE:
+                $connection = \oci_connect(DB_USER,DB_PASSWORD,DB_HOST."/".DB_DATABASE);
+                if (!$connection){
+                    throw new \Error("Database connection error");
+                }
         }
 
-        $mysqli->query("SET time_zone = '+1:00'");
-        $mysqli->query("SET timezone = '+1:00'");
-        $mysqli->set_charset("utf8mb4");
-        $mysqli->query("SET SESSION sql_mode = 'ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-        self::$connection = $mysqli;
+
+
+        self::$connection = $connection;
 
         return self::$connection;
     }
