@@ -12,7 +12,7 @@ include_once './php/FuxFramework/Routing/Request.php';
 include_once './php/FuxFramework/Routing/Router.php';
 include_once './php/FuxFramework/helpers.php';
 
-if (DB_ENABLE){
+if (DB_ENABLE && DB_TYPE === DB_TYPE_MYSQL){
     sanitize_get();
     sanitize_post();
     sanitize_request();

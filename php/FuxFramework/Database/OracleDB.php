@@ -2,15 +2,21 @@
 
 namespace Fux;
 
-class OracleDB{
+class OracleDB
+{
 
-    public static function query($sql){
+    public static function query($sql)
+    {
         $stmt = oci_parse(DB::ref(), $sql);
-        oci_execute($stmt);
+        $result = oci_execute($stmt);
+        if (!$result) {
+            echo oci_error();
+        }
         return $stmt;
     }
 
-    public static function fetchAll($stmt){
+    public static function fetchAll($stmt)
+    {
         $res = [];
         oci_fetch_all($stmt, $res, null, null, OCI_FETCHSTATEMENT_BY_ROW);
         return $res;

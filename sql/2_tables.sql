@@ -24,8 +24,8 @@ CREATE TABLE media OF t_media
 
 CREATE TABLE web_page_links
 (
-    source_url      VARCHAR(255) REFERENCES web_pages (url),
-    destination_url VARCHAR(255)  REFERENCES web_pages (url),
+    source_url      VARCHAR(255) REFERENCES web_pages (url) ON DELETE CASCADE,
+    destination_url VARCHAR(255)  REFERENCES web_pages (url) ON DELETE CASCADE,
     PRIMARY KEY (source_url, destination_url)
 );
 
@@ -38,7 +38,7 @@ CREATE TABLE queries OF t_query
 CREATE TABLE results
 (
     query_id INTEGER REFERENCES queries(query_id),
-    page_url VARCHAR(255) REFERENCES web_pages(url),
+    page_url VARCHAR(255) REFERENCES web_pages(url) ON DELETE CASCADE,
     rank INTEGER,
     PRIMARY KEY(query_id, page_url)
 );

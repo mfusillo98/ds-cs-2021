@@ -9,13 +9,6 @@ $router->get('/', function(Request $request){
     return TestController::myTestMethod();
 });
 
-
-$router->get('/error', function (){
-    return new FuxResponse("ERROR","This is an error!", null, true);
-});
-$router->get('/success', function (){
-    return new FuxResponse("OK","This is custom success page!", [
-        "forwardLink" => "https://google.com",
-        "forwardLinkText" => "Go to Google homepage"
-    ], true);
+$router->get('/seeding/web-page', function (){
+    return \App\Controllers\Seeding\WebpageSeedingController::webpageSeeding();
 });

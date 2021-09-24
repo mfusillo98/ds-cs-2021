@@ -5,8 +5,8 @@
 CREATE SEQUENCE term_seq START WITH 1;
 CREATE OR REPLACE TRIGGER term_id
     BEFORE INSERT
-           ON terms
-               FOR EACH ROW
+    ON terms
+    FOR EACH ROW
 BEGIN
     SELECT term_seq.NEXTVAL
     INTO :new.term_id
@@ -35,6 +35,18 @@ BEGIN
     FROM dual;
 END;
 /
+CREATE OR REPLACE TRIGGER result_rank
+    BEFORE INSERT
+    ON results
+    FOR EACH ROW
+BEGIN
+    SELECT r
+    INTO :new.rank
+    FROM (
+             SELECT (rank+1) as r FROM results WHERE query_id = :new.query_id ORDER BY rank DESC
+         );
+END;
+
 
 -- ##########################
 -- Triggers for unique fields
