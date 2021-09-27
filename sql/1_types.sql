@@ -4,7 +4,7 @@
 CREATE OR REPLACE TYPE t_web_page FORCE AS OBJECT
 (
     url       varchar(255),
-    "content" CLOB,
+    page_content varchar(1024),
     title     varchar(255)
 );
 /

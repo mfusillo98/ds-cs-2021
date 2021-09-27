@@ -217,7 +217,7 @@ if (!function_exists('sanitize_post')) {
         if ($_POST_SANITIZED) return;
         array_walk_recursive($_POST, function (&$leaf) {
             if (is_string($leaf))
-                $leaf = mysqli_real_escape_string(DB::ref(), $leaf);
+                $leaf = filter_var($leaf, FILTER_SANITIZE_SPECIAL_CHARS);
         });
         $_POST_SANITIZED = true;
     }
@@ -230,7 +230,7 @@ if (!function_exists('sanitize_get')) {
         if ($_GET_SANITIZED) return;
         array_walk_recursive($_GET, function (&$leaf) {
             if (is_string($leaf))
-                $leaf = mysqli_real_escape_string(DB::ref(), $leaf);
+                $leaf = filter_var($leaf, FILTER_SANITIZE_SPECIAL_CHARS);
         });
         $_GET_SANITIZED = true;
     }
@@ -242,7 +242,7 @@ if (!function_exists('sanitize_request')) {
         if ($_REQUEST_SANITIZED) return;
         array_walk_recursive($_REQUEST, function (&$leaf) {
             if (is_string($leaf))
-                $leaf = mysqli_real_escape_string(DB::ref(), $leaf);
+                $leaf = filter_var($leaf, FILTER_SANITIZE_SPECIAL_CHARS);
         });
         $_REQUEST_SANITIZED = true;
     }
@@ -252,7 +252,7 @@ function sanitize_object(&$object)
 {
     array_walk_recursive($object, function (&$leaf) {
         if (is_string($leaf))
-            $leaf = mysqli_real_escape_string(DB::ref(), $leaf);
+            $leaf = filter_var($leaf, FILTER_SANITIZE_SPECIAL_CHARS);
     });
 }
 

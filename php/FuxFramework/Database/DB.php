@@ -60,7 +60,7 @@ class DB
 
     public static function sanitize($str)
     {
-        return DB::ref()->real_escape_string($str);
+        return filter_var($str, FILTER_SANITIZE_SPECIAL_CHARS);
     }
 
     public static function multiQuery($queries)
