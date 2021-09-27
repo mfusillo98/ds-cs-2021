@@ -34,23 +34,6 @@ BEGIN
     INTO :new.query_id
     FROM dual;
 END;
-/
-CREATE OR REPLACE TRIGGER result_rank
-    AFTER INSERT
-    ON results
-    FOR EACH ROW
-DECLARE
-    row_count INTEGER;
-BEGIN
-    SELECT COUNT(*)
-    INTO row_count
-    FROM (
-             SELECT *
-             FROM results
-             WHERE query_id = :new.query_id
-         );
-    UPDATE results SET rank = (row_count + 1) WHERE query_id = :new.query_id AND page_url = :new.page_url;
-END;
 
 
 -- ##########################

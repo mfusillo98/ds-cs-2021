@@ -72,8 +72,8 @@ CREATE OR REPLACE PROCEDURE populate_queries_results AS
 BEGIN
     DELETE FROM results;
 
-    INSERT INTO results (query_id, page_url)
-    SELECT q.query_id, t.page_url.url
+    INSERT INTO results (query_id, page_url, rank)
+    SELECT q.query_id, t.page_url.url, row_number() OVER (PARTITION BY q.query_id ORDER BY DBMS_RANDOM.VALUE) rank
     FROM queries q
              JOIN terms t ON q.keywords LIKE CONCAT('%', CONCAT(t.term, '%'))
     GROUP BY (q.query_id, t.page_url);

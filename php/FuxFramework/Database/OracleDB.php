@@ -5,12 +5,16 @@ namespace Fux;
 class OracleDB
 {
 
-    public static function query($sql)
+    public static function query($sql, $binds = [])
     {
         $stmt = oci_parse(DB::ref(), $sql);
+        foreach($binds as $name => &$var){
+            oci_bind_by_name($stmt, $name, $var);
+        }
         $result = oci_execute($stmt);
         if (!$result) {
             echo oci_error();
+            return $result;
         }
         return $stmt;
     }

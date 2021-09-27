@@ -8,7 +8,12 @@
         <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
             <li class="nav-item mx-md-2">
                 <a class="nav-link" href="">
-                    Add results (Op 1)
+                    Add web page
+                </a>
+            </li>
+            <li class="nav-item mx-md-2">
+                <a class="nav-link" href="">
+                    Saved queries
                 </a>
             </li>
             <li class="nav-item mx-md-2">

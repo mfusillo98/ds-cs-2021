@@ -14,7 +14,7 @@
 </head>
 
 <body class="bg-light">
-<h1>This is custom page for application success state</h1>
+<h1>Operation completed!</h1>
 <p>
     <?= $successMessage ?>
 </p>

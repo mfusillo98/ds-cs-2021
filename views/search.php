@@ -31,6 +31,17 @@
 
     <span class="text-muted">Sono stati trovati <?= count($results) ?> risultati</span>
 
+    <form method="GET" action="<?= routeFullUrl('/save-search') ?>">
+        <div class="input-group input-group-lg" style="max-width: 500px; width: 100%;">
+            <input type="hidden" name="q" value="<?= htmlspecialchars($query) ?>"/>
+            <div class="input-group-append">
+                <button class="btn btn-link">
+                    Salva ricerca in archivio
+                </button>
+            </div>
+        </div>
+    </form>
+
     <hr/>
 
     <?php foreach($results as $r){ ?>

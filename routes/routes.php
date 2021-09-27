@@ -12,3 +12,7 @@ $router->get('/', function(Request $request){
 $router->get('/search', function(Request $request){
     return App\Controllers\SearchController::index($request);
 });
+
+$router->get('/save-search', function(Request $request){
+    return App\Controllers\SearchController::saveSearchQuery($request);
+});
