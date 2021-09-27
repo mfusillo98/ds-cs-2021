@@ -7,7 +7,7 @@
     <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
         <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
             <li class="nav-item mx-md-2">
-                <a class="nav-link" href="">
+                <a class="nav-link" href="<?= routeFullUrl('/add-web-page') ?>">
                     Add web page
                 </a>
             </li>
