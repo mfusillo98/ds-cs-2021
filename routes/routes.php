@@ -18,7 +18,7 @@ $router->get('/save-search', function(Request $request){
     return App\Controllers\SearchController::saveSearchQuery($request);
 });
 
-/** @MARK: Search */
+/** @MARK: Web pages */
 
 $router->get('/add-web-page', function(Request $request){
     return App\Controllers\WebpageController::addWebPagePage();
@@ -26,4 +26,11 @@ $router->get('/add-web-page', function(Request $request){
 
 $router->post('/add-web-page', function(Request $request){
     return App\Controllers\WebpageController::addWebPage($request);
+});
+
+
+/** @MARK: Queries */
+
+$router->get('/saved-queries', function(Request $request){
+    return App\Controllers\QueryController::savedQueriesPage();
 });
