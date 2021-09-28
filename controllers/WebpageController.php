@@ -86,4 +86,37 @@ class WebpageController
         ]);
     }
 
+
+    /**
+     * Display web page info
+     *
+     * @param Request $request
+     * @return string
+     * @var $queryParams array{page_url: integer}
+     *
+     */
+    public static function viewWebPagePage(Request $request)
+    {
+        $params = $request->getParams();
+        $params['page_url'] = base64_decode($params['page_url']);
+        $stmt_page = OracleDB::query("SELECT * FROM web_pages WHERE url = :page_url", [
+            "page_url" => $params['page_url']
+        ]);
+        $page = oci_fetch_assoc($stmt_page);
+        oci_free_statement($stmt_page);
+        if (!$page) {
+            return new FuxResponse("ERROR", "The web page doesn't exists anymore!", null, true);
+        }
+
+        $stmt_terms = OracleDB::query("SELECT * FROM terms WHERE page_url = (select ref(w) from web_pages w where URL = :page_url)", [
+            "page_url" => $params['page_url']
+        ]);
+        $terms = OracleDB::fetchAll($stmt_terms);
+
+        return view("viewWebPage",[
+            "webpage" => $page,
+            "terms" => $terms
+        ]);
+    }
+
 }

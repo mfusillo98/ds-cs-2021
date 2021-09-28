@@ -28,6 +28,10 @@ $router->post('/add-web-page', function(Request $request){
     return App\Controllers\WebpageController::addWebPage($request);
 });
 
+$router->get('/view-page/{page_url}', function(Request $request){
+    return App\Controllers\WebpageController::viewWebPagePage($request);
+});
+
 
 /** @MARK: Queries */
 

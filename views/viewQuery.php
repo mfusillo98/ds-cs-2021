@@ -34,7 +34,7 @@
     <?php foreach($results as $r){ ?>
 
         <div class="py-3">
-            <h4><a href="<?= routeFullUrl("/view-page/$r[URL]") ?>"><?= $r['TITLE'] ?></a></h4>
+            <h4><a href="<?= routeFullUrl("/view-page/".base64_encode($r['URL'])) ?>"><?= $r['TITLE'] ?></a></h4>
             <div class="small text-success"><?= $r['URL'] ?></div>
             <div class="small text-muted">
                 <?= substr($r['PAGE_CONTENT'],0, 128).(strlen($r['PAGE_CONTENT']) > 128 ? '...' : '') ?>

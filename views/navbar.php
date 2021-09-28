@@ -23,11 +23,6 @@
             </li>
             <li class="nav-item mx-md-2">
                 <a class="nav-link" href="">
-                    Explore terms (Op 3)
-                </a>
-            </li>
-            <li class="nav-item mx-md-2">
-                <a class="nav-link" href="">
                     Explore terms extended (Op 4)
                 </a>
             </li>
