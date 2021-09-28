@@ -46,7 +46,7 @@ class SearchController
 
 
     /**
-     * Salve a query with specific keywords and web pages
+     * Save a query with specific keywords and web pages
      *
      * @param Request $request
      * @return string

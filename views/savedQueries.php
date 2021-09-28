@@ -27,7 +27,7 @@
 
     <?php foreach($queries as $q){ ?>
         <div class="py-3">
-            <a href="<?= routeFullUrl("/query?query_id=$q[QUERY_ID]") ?>"><h4><?= $q['KEYWORDS'] ?></h4></a>
+            <a href="<?= routeFullUrl("/view-query?query_id=$q[QUERY_ID]") ?>"><h4><?= $q['KEYWORDS'] ?></h4></a>
             <div class="text-muted">
                 Contains <?= $q['RESULTSNUM'] ?> results
             </div>

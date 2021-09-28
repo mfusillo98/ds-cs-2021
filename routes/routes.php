@@ -34,3 +34,6 @@ $router->post('/add-web-page', function(Request $request){
 $router->get('/saved-queries', function(Request $request){
     return App\Controllers\QueryController::savedQueriesPage();
 });
+$router->get('/view-query', function(Request $request){
+    return App\Controllers\QueryController::viewQueryPage($request);
+});
