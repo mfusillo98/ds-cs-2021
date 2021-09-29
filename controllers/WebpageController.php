@@ -116,7 +116,7 @@ class WebpageController
         oci_free_statement($stmt_terms);
 
         //Fetch page media
-        $stmt_media = OracleDB::query("SELECT m.url, m.mime_type FROM media m WHERE DEREF(m.page_url).URL = :page_url", [
+        $stmt_media = OracleDB::query("SELECT url, mime_type FROM media WHERE DEREF(page_url).URL = :page_url", [
             "page_url" => $params['page_url']
         ]);
         $media = OracleDB::fetchAll($stmt_media);
