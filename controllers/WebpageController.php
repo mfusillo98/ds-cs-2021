@@ -92,7 +92,7 @@ class WebpageController
      *
      * @param Request $request
      * @return string
-     * @var $queryParams array{page_url: integer}
+     * @var $params array{page_url: integer}
      *
      */
     public static function viewWebPagePage(Request $request)
@@ -108,14 +108,82 @@ class WebpageController
             return new FuxResponse("ERROR", "The web page doesn't exists anymore!", null, true);
         }
 
-        $stmt_terms = OracleDB::query("SELECT * FROM terms WHERE page_url = (select ref(w) from web_pages w where URL = :page_url)", [
+        //Fetch page terms
+        $stmt_terms = OracleDB::query("SELECT t.term FROM terms t WHERE DEREF(t.page_url).URL = :page_url", [
             "page_url" => $params['page_url']
         ]);
         $terms = OracleDB::fetchAll($stmt_terms);
+        oci_free_statement($stmt_terms);
 
-        return view("viewWebPage",[
+        //Fetch page media
+        $stmt_media = OracleDB::query("SELECT m.url, m.mime_type FROM media m WHERE DEREF(m.page_url).URL = :page_url", [
+            "page_url" => $params['page_url']
+        ]);
+        $media = OracleDB::fetchAll($stmt_media);
+        oci_free_statement($stmt_media);
+
+        return view("viewWebPage", [
             "webpage" => $page,
-            "terms" => $terms
+            "terms" => $terms,
+            "media" => $media
+        ]);
+    }
+
+    /**
+     * Display web pages info linked to a specific web page
+     *
+     * @param Request $request
+     * @return string
+     * @var $queryStringParams array{page_url: integer, backlink: int | null}
+     *
+     */
+    public static function viewLinkedWebPagesPage(Request $request)
+    {
+        $queryStringParams = $request->getQueryStringParams();
+        $queryStringParams['page_url'] = base64_decode($queryStringParams['page_url']);
+        $stmt_page = OracleDB::query("SELECT * FROM web_pages WHERE url = :page_url", [
+            "page_url" => $queryStringParams['page_url']
+        ]);
+        $page = oci_fetch_assoc($stmt_page);
+        oci_free_statement($stmt_page);
+        if (!$page) {
+            return new FuxResponse("ERROR", "The web page doesn't exists anymore!", null, true);
+        }
+
+        //Fetch page terms
+        $stmt_terms = OracleDB::query("SELECT t.term FROM terms t WHERE DEREF(t.page_url).URL = :page_url", [
+            "page_url" => $queryStringParams['page_url']
+        ]);
+        $terms = OracleDB::fetchAll($stmt_terms);
+        oci_free_statement($stmt_terms);
+
+
+        //Fetch linked pages terms
+
+
+        $linkedWebsitesSql = "
+            SELECT destination_url as url, 0 as link_type FROM web_page_links WHERE source_url = :page_url
+        ";
+        if (isset($queryStringParams['backlink'])) {
+            $linkedWebsitesSql .= " UNION ";
+            $linkedWebsitesSql .= "SELECT source_url as url, 1 as link_type FROM web_page_links WHERE destination_url = :page_url";
+        }
+        $linkedWebsitesSql = "SELECT d.url, MIN(d.link_type) as link_type FROM ($linkedWebsitesSql) d GROUP BY d.url";
+
+        $termsSQL = "
+            SELECT t.term, l.url, l.link_type FROM ($linkedWebsitesSql) l 
+            JOIN terms t ON DEREF(t.page_url).URL = l.url
+            ORDER BY l.url ASC, t.term_id ASC
+        ";
+
+        $stmt_linked_terms = OracleDB::query($termsSQL, ["page_url" => $queryStringParams['page_url']]);
+        $linked_terms = OracleDB::fetchAll($stmt_linked_terms);
+        oci_free_statement($stmt_linked_terms);
+
+        return view("viewLinkedWebPage", [
+            "webpage" => $page,
+            "terms" => $terms,
+            "linked_terms" => $linked_terms
         ]);
     }
 

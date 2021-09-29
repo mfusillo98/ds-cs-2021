@@ -6,6 +6,21 @@
 -- 1) Navigate the route http://{domain}/{project-dir}/seeding/web-page (it could take some minutes to complete)
 -- 2) Execute query "CALL populate()"
 
+CREATE OR REPLACE FUNCTION generate_random_url RETURN VARCHAR AS
+BEGIN
+    return CONCAT(
+            CONCAT(
+                    'https://',
+                    DBMS_RANDOM.STRING('X', TRUNC(DBMS_RANDOM.VALUE(4, 25))) -- hostname
+                ),
+            CONCAT(
+                    '.',
+                    DBMS_RANDOM.STRING('L', TRUNC(DBMS_RANDOM.VALUE(2, 3))) -- TLD
+                )
+        );
+end;
+/
+
 CREATE OR REPLACE PROCEDURE populate_web_page(num IN INTEGER) AS
 BEGIN
     DELETE FROM terms;
@@ -13,20 +28,37 @@ BEGIN
     FOR i IN 1..num
         LOOP
             INSERT INTO web_pages (url, title)
-            VALUES (CONCAT(
-                            CONCAT(
-                                    'https://',
-                                    DBMS_RANDOM.STRING('X', TRUNC(DBMS_RANDOM.VALUE(4, 25))) -- hostname
-                                ),
-                            CONCAT(
-                                    '.',
-                                    DBMS_RANDOM.STRING('L', TRUNC(DBMS_RANDOM.VALUE(2, 3))) -- TLD
-                                )
-                        ), -- url
-                    DBMS_RANDOM.STRING('A', TRUNC(DBMS_RANDOM.VALUE(10, 64))) -- title
-                   );
+            VALUES (generate_random_url(), DBMS_RANDOM.STRING('A', TRUNC(DBMS_RANDOM.VALUE(10, 64))));
         END LOOP;
     DBMS_OUTPUT.PUT_LINE('Generated ' || num || ' webpages');
+END;
+/
+
+CREATE OR REPLACE PROCEDURE populate_web_page_media(imagesNum IN INTEGER, videosNum IN INTEGER) AS
+BEGIN
+    DELETE FROM media;
+    FOR page IN (SELECT * FROM web_pages)
+        LOOP
+            FOR i IN 1..imagesNum
+                LOOP
+                    INSERT INTO media (url, mime_type, page_url)
+                    VALUES (
+                                CONCAT(generate_random_url(),'/img.png'),
+                                'image/png',
+                                (select ref(w) from web_pages w WHERE url = page.url)
+                           );
+                END LOOP;
+            FOR i IN 1..videosNum
+                LOOP
+                    INSERT INTO media (url, mime_type, page_url)
+                    VALUES (
+                               CONCAT(generate_random_url(),'/video.mp4'),
+                               'video/mpeg4',
+                               (select ref(w) from web_pages w WHERE url = page.url)
+                           );
+                END LOOP;
+        end loop;
+    DBMS_OUTPUT.PUT_LINE('Generated ' || imagesNum || ' images and ' || videosNum || ' videos for each web page');
 END;
 /
 
@@ -85,7 +117,9 @@ END;
 
 CREATE OR REPLACE PROCEDURE populate AS
 BEGIN
-    populate_web_page_links(3);
+    populate_web_page(1000); -- Create web pages
+    populate_web_page_media(3,1); -- Create media
+    populate_web_page_links(3); -- Create web pages links
     populate_queries(800, 3);
     populate_queries_results();
 
