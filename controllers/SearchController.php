@@ -73,18 +73,18 @@ class SearchController
         if (is_array($existingQueries) && count($existingQueries)) {
             $query_id = $existingQueries[0]['QUERY_ID'];
         } else {
-            $stmt_query = OracleDB::query(
-                "INSERT INTO queries (keywords) values ('" . implode(", ", $keywords) . "') RETURNING query_id INTO :new_id",
-                [
-                    "new_id" => &$query_id
-                ]
-            );
+            $stmt_query = OracleDB::query("INSERT INTO queries (keywords) values ('" . implode(", ", $keywords) . "')");
             oci_free_statement($stmt_query);
+            $stmt_query = OracleDB::query("SELECT * FROM queries where keywords = '" . implode(", ", $keywords) . "'");
+            $existingQueries = OracleDB::fetchAll($stmt_query);
+            oci_free_statement($stmt_query);
+            $query_id = $existingQueries[0]['QUERY_ID'];
         }
 
         if (!$query_id) {
             return new FuxResponse("ERROR", "Something went wrong, try again later!");
         }
+
 
         //Delete all previous search results if exists
         $stmt_delete = OracleDB::query("DELETE FROM results WHERE query_id = $query_id");
@@ -101,6 +101,7 @@ class SearchController
             JOIN web_pages w ON t.url = w.url
         ";
 
+        echo $sql;
         $stmt = OracleDB::query($sql);
         if (!$stmt) {
             return new FuxResponse("ERROR", "Something went wrong, try again later.");
