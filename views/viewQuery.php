@@ -33,7 +33,7 @@
 
     <?php foreach($results as $r){ ?>
 
-        <div class="py-3">
+        <div class="card border-0 bg-white shadow p-3 my-3">
             <h4><a href="<?= routeFullUrl("/view-page/".base64_encode($r['URL'])) ?>"><?= $r['TITLE'] ?></a></h4>
             <div class="small text-success"><?= $r['URL'] ?></div>
             <div class="small text-muted">

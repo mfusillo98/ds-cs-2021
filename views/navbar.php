@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+<nav class="navbar navbar-expand-lg navbar-light border-bottom bg-white">
     <a class="navbar-brand" href="<?= routeFullUrl('') ?>">
         <img src="<?= asset('img/logo.png') ?>" alt="Google Police logo" style="height: 35px;"/>
     </a>
