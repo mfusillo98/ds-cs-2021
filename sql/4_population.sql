@@ -118,9 +118,22 @@ BEGIN
     RETURN word;
 end;
 /
+CREATE OR REPLACE PROCEDURE clear_db AS
+BEGIN
+    DELETE FROM terms;
+    DELETE FROM media;
+    DELETE FROM web_page_links;
+    DELETE FROM results;
+    DELETE FROM queries;
+    DELETE FROM web_pages;
+END;
+/
 CREATE OR REPLACE PROCEDURE populate_web_page(num IN INTEGER) AS
 BEGIN
     DELETE FROM terms;
+    DELETE FROM media;
+    DELETE FROM web_page_links;
+    DELETE FROM results;
     DELETE FROM web_pages;
     FOR i IN 1..num
         LOOP
@@ -150,8 +163,8 @@ BEGIN
                     SELECT CONCAT(curr_page_content,CONCAT(' ',curr_term)) INTO curr_page_content FROM dual;
                     INSERT INTO terms (term,page_url)
                     VALUES (
-                            curr_term,
-                            (select ref(w) from web_pages w WHERE url = page.url)
+                               curr_term,
+                               (select ref(w) from web_pages w WHERE url = page.url)
                            );
                 end loop;
             UPDATE web_pages SET page_content = curr_page_content WHERE url = page.url;
@@ -214,9 +227,11 @@ BEGIN
     FOR i IN 1..queriesNum
         LOOP
             INSERT INTO queries (query_id, keywords)
-            SELECT null, LISTAGG(term, ', ')
-            FROM (SELECT DISTINCT term FROM terms ORDER BY Dbms_Random.Value)
-            WHERE ROWNUM <= keywordsNum;
+            SELECT null, get_random_term() FROM dual
+                UNION
+            SELECT null, get_random_term() FROM dual
+                UNION
+            SELECT null, get_random_term() FROM dual;
         END LOOP;
 
     DBMS_OUTPUT.PUT_LINE('Generated ' || queriesNum || ' queries');
@@ -240,14 +255,16 @@ END;
 
 CREATE OR REPLACE PROCEDURE populate AS
 BEGIN
-    populate_web_page(1000); -- Create web pages
-    populate_web_page_terms(100,200); -- Create page terms
-    populate_web_page_media(3, 1); -- Create media
-    populate_web_page_links(3); -- Create web pages links
-    populate_queries(800, 3); --
-    populate_queries_results(); --
+    clear_db(); -- Clear any old/test data  ~10s
+    populate_web_page(200); -- Create web pages  ~1s
+    populate_web_page_terms(50,150); -- Create page terms  ~35s
+    populate_web_page_media(2, 1); -- Create media  ~1s
+    populate_web_page_links(2); -- Create web pages links  ~2s
+    populate_queries(20, 3); -- Create random query based on terms available  ~1s
+    populate_queries_results(); -- Populate queries results based on real query keywords  ~1s
 
     DBMS_OUTPUT.PUT_LINE('Population completed');
 END;
 /
 
+call populate();

@@ -42,7 +42,7 @@
         <h2>Page media</h2>
         <ul>
             <?php foreach ($media as $m) { ?>
-                <li><?= $media['URL'] ?> (<?= $media['MIME_TYPE'] ?>) <a href="<?= $media['URL'] ?>">Open</a></li>
+                <li><?= $m['URL'] ?> (<?= $m['MIME_TYPE'] ?>) <a href="<?= $m['URL'] ?>">Open</a></li>
             <?php } ?>
         </ul>
         <?php if (!count($media)) { ?>

@@ -1,4 +1,8 @@
-<nav class="navbar navbar-expand-lg navbar-light">
+<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+    <a class="navbar-brand" href="<?= routeFullUrl('') ?>">
+        <img src="<?= asset('img/logo.png') ?>" alt="Google Police logo" style="height: 35px;"/>
+    </a>
+
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
             aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -19,11 +23,6 @@
             <li class="nav-item mx-md-2">
                 <a class="nav-link" href="<?= routeFullUrl('/saved-queries') ?>">
                     Saved queries
-                </a>
-            </li>
-            <li class="nav-item mx-md-2">
-                <a class="nav-link" href="">
-                    Explore terms extended (Op 4)
                 </a>
             </li>
         </ul>
