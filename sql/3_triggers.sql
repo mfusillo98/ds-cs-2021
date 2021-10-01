@@ -41,7 +41,7 @@ END;
 -- ##########################
 /
 CREATE OR REPLACE TRIGGER unique_media_in_page
-    AFTER INSERT
+    FOR INSERT
     ON media
     COMPOUND TRIGGER
     row_count INTEGER;
