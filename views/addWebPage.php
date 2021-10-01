@@ -45,6 +45,11 @@
                     <div id="media-container"></div>
                     <button class="btn btn-link" type="button" onclick="addMedia()">+ Add new media</button>
                 </div>
+                <div class="form-group">
+                    <h3>Pages links</h3>
+                    <div id="links-container"></div>
+                    <button class="btn btn-link" type="button" onclick="addLink()">+ Add new link</button>
+                </div>
                 <button class="btn btn-primary">
                     Save web page
                 </button>
@@ -69,6 +74,19 @@
         </div>
     </div>
 
+    <div id="link-template" class="d-none">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-6">
+                    <input type="text" name="link_url[]" class="form-control" placeholder="URL"/>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeLink(this)">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function addMedia(){
             const html = document.getElementById('media-template').innerHTML;
@@ -78,6 +96,18 @@
         }
 
         function removeMedia(btnEl){
+            const formGroupEl = btnEl.parentElement.parentElement.parentElement;
+            formGroupEl.parentElement.removeChild(formGroupEl);
+        }
+
+        function addLink(){
+            const html = document.getElementById('link-template').innerHTML;
+            const el = document.createElement('div');
+            el.innerHTML = html;
+            document.getElementById('links-container').appendChild(el);
+        }
+
+        function removeLink(btnEl){
             const formGroupEl = btnEl.parentElement.parentElement.parentElement;
             formGroupEl.parentElement.removeChild(formGroupEl);
         }

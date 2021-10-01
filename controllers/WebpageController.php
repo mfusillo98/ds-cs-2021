@@ -104,6 +104,27 @@ class WebpageController
             }
         }
 
+        //Save links
+        $stmt_delete_links = OracleDB::query("DELETE FROM web_page_links WHERE source_url = :url", [
+            "url" => $body['url']
+        ]);
+        if (!$stmt_delete_links) {
+            return new FuxResponse("ERROR", "Something went wrong, try again later.");
+        }
+        oci_free_statement($stmt_delete_links);
+        if (isset($body['link_url'])) {
+            foreach ($body['link_url'] as $i => $url) {
+                $insert_link_stmt = OracleDB::query("INSERT INTO web_page_links (source_url, destination_url) VALUES (:source_url,:destination_url)", [
+                    "source_url" => $body['url'],
+                    "destination_url" => $body['link_url'][$i],
+                ]);
+                if (!$insert_link_stmt) {
+                    return new FuxResponse("ERROR", "Something went wrong, try again later.");
+                }
+                oci_free_statement($insert_link_stmt);
+            }
+        }
+
         return view("addWebPage", [
             "success" => is_array($webpages) && count($webpages) ? "Web page update correctly" : "Web page added successfully"
         ]);
