@@ -43,9 +43,10 @@ END;
 CREATE OR REPLACE TRIGGER unique_media_in_page
     AFTER INSERT
     ON media
-    FOR EACH ROW
-DECLARE
+    COMPOUND TRIGGER
     row_count INTEGER;
+
+AFTER STATEMENT IS
 BEGIN
     SELECT COUNT(*)
     INTO row_count
@@ -58,4 +59,5 @@ BEGIN
     IF row_count != 0 THEN
         RAISE_APPLICATION_ERROR(1001, 'Duplicated media URL in page');
     END IF;
-END;
+END AFTER STATEMENT;
+    END;
