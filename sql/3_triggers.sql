@@ -39,7 +39,7 @@ END;
 -- ##########################
 -- Triggers for unique fields
 -- ##########################
-
+/
 CREATE OR REPLACE TRIGGER unique_media_in_page
     AFTER INSERT
     ON media
