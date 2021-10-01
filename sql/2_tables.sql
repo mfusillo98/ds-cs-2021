@@ -42,3 +42,7 @@ CREATE TABLE results
     rank INTEGER,
     PRIMARY KEY(query_id, page_url)
 );
+/
+CREATE INDEX queryKeywordIdx ON queries(keywords);
+/
+CREATE INDEX termsIdx ON terms(term);

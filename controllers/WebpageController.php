@@ -90,16 +90,18 @@ class WebpageController
             return new FuxResponse("ERROR", "Something went wrong, try again later.");
         }
         oci_free_statement($stmt_delete_media);
-        foreach ($body['media_url'] as $i => $url) {
-            $insert_media_stmt = OracleDB::query("INSERT INTO media (url, mime_type, page_url) VALUES (:media_url,:mime,(select ref(w) from web_pages w where URL = :url))", [
-                "url" => $body['url'],
-                "media_url" => $body['media_url'][$i],
-                "mime" => $body['media_mime'][$i],
-            ]);
-            if (!$insert_media_stmt) {
-                return new FuxResponse("ERROR", "Something went wrong, try again later.");
+        if (isset($body['media_url'])) {
+            foreach ($body['media_url'] as $i => $url) {
+                $insert_media_stmt = OracleDB::query("INSERT INTO media (url, mime_type, page_url) VALUES (:media_url,:mime,(select ref(w) from web_pages w where URL = :url))", [
+                    "url" => $body['url'],
+                    "media_url" => $body['media_url'][$i],
+                    "mime" => $body['media_mime'][$i],
+                ]);
+                if (!$insert_media_stmt) {
+                    return new FuxResponse("ERROR", "Something went wrong, try again later.");
+                }
+                oci_free_statement($insert_media_stmt);
             }
-            oci_free_statement($insert_media_stmt);
         }
 
         return view("addWebPage", [

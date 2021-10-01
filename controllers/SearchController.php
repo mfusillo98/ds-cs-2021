@@ -101,7 +101,6 @@ class SearchController
             JOIN web_pages w ON t.url = w.url
         ";
 
-        echo $sql;
         $stmt = OracleDB::query($sql);
         if (!$stmt) {
             return new FuxResponse("ERROR", "Something went wrong, try again later.");
